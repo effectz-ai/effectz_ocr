@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface MarkdownViewerProps {
     onApiCall: () => Promise<string>;
@@ -45,7 +46,7 @@ export default function MarkdownViewer({ onApiCall }: MarkdownViewerProps) {
             </button>
             <div className="w-full h-[600px] text-black overflow-y-auto border border-gray-300 rounded p-4">
                 {markdown ? (
-                    <ReactMarkdown className="text-black">{markdown}</ReactMarkdown>
+                    <Markdown remarkPlugins={[remarkGfm]}>{markdown}</Markdown>
                 ) : (
                     <p className="text-gray-500">Markdown preview will appear here</p>
                 )}
