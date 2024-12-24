@@ -60,6 +60,15 @@ export default function MarkdownViewer({ onApiCall }: MarkdownViewerProps) {
                         td: ({ children }) => (
                             <td className="border border-gray-300 p-2">{children}</td>
                         ),
+                        ul: ({ children }) => (
+                            <ul className="list-disc list-inside ml-4">{children}</ul>
+                        ),
+                        ol: ({ children }) => (
+                            <ol className="list-decimal list-inside ml-4">{children}</ol>
+                        ),
+                        li: ({ children }) => (
+                            <li className="mb-1">{children}</li>
+                        ),
                     }}>{markdown}</Markdown>
                 ) : (
                     <p className="text-gray-500">Markdown preview will appear here</p>

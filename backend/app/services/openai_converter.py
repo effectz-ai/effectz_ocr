@@ -1,16 +1,15 @@
 import os
-import ollama
 from openai import OpenAI
 import base64
 
-from .base_markdown_converter import BaseMarkdownConverter
+from .base_converter import BaseConverter
 
-class OpenAIMarkdownConverter(BaseMarkdownConverter):
+class OpenAIConverter(BaseConverter):
 
-    def convert_to_markdown(self, system_prompt: str, image_path_list: list[str]):
-        return self.convert_to_markdown_openai(system_prompt, image_path_list)
+    def convert_images_to_format(self, system_prompt: str, image_path_list: list[str]):
+        return self.convert_images_to_format_openai(system_prompt, image_path_list)
     
-    def convert_to_markdown_openai(self, system_prompt: str, image_path_list: list[str]):
+    def convert_images_to_format_openai(self, system_prompt: str, image_path_list: list[str]):
         openai_key = os.getenv("OPENAI_KEY")
         mllm_name = os.getenv("OPENAI_MLLM")
 
@@ -44,7 +43,9 @@ class OpenAIMarkdownConverter(BaseMarkdownConverter):
                 "text": system_prompt,
             },
         ]
+
         content.extend(base64_image)
+
         response = client.chat.completions.create(
             model=mllm_name,
             messages=[

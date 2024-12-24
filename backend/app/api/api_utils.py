@@ -3,24 +3,24 @@ import os
 
 from app.services.azure_analyzer import AzureDocumentAnalyzer
 from app.services.hf_analyzer import HFDocumentAnalyzer
-from app.services.ollama_markdown_converter import OllamaMarkdownConverter
-from app.services.openai_markdown_converter import OpenAIMarkdownConverter
+from app.services.ollama_converter import OllamaConverter
+from app.services.openai_converter import OpenAIConverter
+from app.services.url_converter import URLConverter
 from app.utils import clean_temp_storage, docx_to_images, pdf_to_images, crop_images
 
 TEMP_STORAGE_DIR = os.getenv("TEMP_STORAGE_DIR", "temp_storage")
 
-async def process_file(file: UploadFile, file_extension: str, system_prompt: str, markdown_model_type: str, layout_model_type=None, layout=False):
-    sys_prompt = system_prompt if system_prompt is not None else os.getenv("SYSTEM_PROMPT")
-    markdown_generation_model_type = markdown_model_type if markdown_model_type is not None else os.getenv("MARKDOWN_GENERATION_MODEL_TYPE")
+async def process_file(file: UploadFile, file_extension: str, system_prompt: str, conversion_model_type: str, layout_model_type=None, layout=False):
+    format_conversion_model_type = conversion_model_type if conversion_model_type is not None else os.getenv("CONVERSION_MODEL_TYPE")
     
     if sys_prompt is None:
         raise ValueError(
             "Please set the system prompt"
         )
     
-    if markdown_generation_model_type is None:
+    if format_conversion_model_type is None:
         raise ValueError(
-            "Please set the markdown generation model type"
+            "Please set the conversion model type"
         )
 
     file_storage_path = f"{TEMP_STORAGE_DIR}/{file.filename}"
@@ -52,12 +52,17 @@ async def process_file(file: UploadFile, file_extension: str, system_prompt: str
 
         image_paths = [crop_images(image_paths[0], bbox)[0]]
     
-    if markdown_generation_model_type == "ollama":
-            markdown_content = OllamaMarkdownConverter().convert_to_markdown(sys_prompt, image_paths)
+    if format_conversion_model_type == "ollama":
+            converted_content = OllamaConverter().convert_images_to_format(system_prompt, image_paths)
         
-    elif markdown_generation_model_type == "openai":
-            markdown_content = OpenAIMarkdownConverter().convert_to_markdown(sys_prompt, image_paths)
+    elif format_conversion_model_type == "openai":
+            converted_content = OpenAIConverter().convert_images_to_format(system_prompt, image_paths)
 
     clean_temp_storage(TEMP_STORAGE_DIR)
 
-    return markdown_content
+    return converted_content
+
+async def process_url(url: str):
+    converted_content = URLConverter().convert(url)
+    
+    return converted_content

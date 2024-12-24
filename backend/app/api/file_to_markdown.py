@@ -1,17 +1,20 @@
+import os
 import logging
 from fastapi import APIRouter, HTTPException, Form, UploadFile, File
 from pathlib import Path
 
 from app.api.api_utils import process_file
 
-get_markdown_router = app = APIRouter()
+file_to_markdown_router = app = APIRouter()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
-# POST - /api/get_markdown
+system_prompt = os.getenv("FILE_TO_MD_SYSTEM_PROMPT")
+
+# POST - /api/file_to_markdown
 @app.post("")
-async def get_markdown(file: UploadFile = File(...), system_prompt: str | None = Form(None), markdown_model_type: str | None = Form(None)):
+async def file_to_markdown(file: UploadFile = File(...), conversion_model_type: str | None = Form(None)):
     try:
         if file.filename == "":
             logger.warning(f"No file uploaded")
@@ -24,7 +27,7 @@ async def get_markdown(file: UploadFile = File(...), system_prompt: str | None =
             logger.warning(f"Invalid file type: {file_extension}")
             raise HTTPException(status_code=400, detail=f"Unsupported file type: {file_extension}")
         
-        response = await process_file(file, file_extension, system_prompt, markdown_model_type)
+        response = await process_file(file, file_extension, system_prompt, conversion_model_type)
 
         logger.info("Document converted successfully")
         return {'markdown': response}

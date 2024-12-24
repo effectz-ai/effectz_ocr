@@ -7,16 +7,18 @@ load_dotenv()
 
 import logging
 import os
-from pathlib import Path
 import uvicorn
 from fastapi import FastAPI
 
-from app.api.get_markdown import get_markdown_router
+from app.api.file_to_html import file_to_html_router
+from app.api.file_to_json import file_to_json_router
+from app.api.file_to_markdown import file_to_markdown_router
+from app.api.file_to_xml import file_to_xml_router
+from app.api.url_to_markdown import url_to_markdown_router
 from app.api.layout_entity_markdown import layout_entity_markdown_router
 
 # initialize app
 app = FastAPI()
-
 
 # Add CORS middleware
 app.add_middleware(
@@ -36,7 +38,11 @@ TEMP_STORAGE_DIR = os.getenv("TEMP_STORAGE_DIR", "temp_storage")
 if not os.path.exists(TEMP_STORAGE_DIR):
     os.makedirs(TEMP_STORAGE_DIR)
 
-app.include_router(get_markdown_router, prefix="/api/get_markdown")
+app.include_router(file_to_html_router, prefix="/api/file_to_html")
+app.include_router(file_to_json_router, prefix="/api/file_to_json")
+app.include_router(file_to_markdown_router, prefix="/api/file_to_markdown")
+app.include_router(file_to_xml_router, prefix="/api/file_to_xml")
+app.include_router(url_to_markdown_router, prefix="/api/url_to_markdown")
 app.include_router(layout_entity_markdown_router, prefix="/api/layout_entity_markdown")
 
 # run app
